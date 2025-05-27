@@ -1,0 +1,21 @@
+// 첫번째 텍스쳐의 수직으로 뒤집고 두번째 텍스쳐의 밝기(Luma)값을 구합니다.
+// 수직으로 뒤집혀진 텍스쳐와 두번째 텍스쳐의 밝기값을 절반씩 합쳐진 RGB값을 반환합니다.
+// 알파값는 1로 반환합니다.
+// 밝기(Luma)의 계산식은 Y = RGB * (0.2126, 0.7152, 0.0722) 입니다.
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = fragCoord / iResolution.xy;
+
+    // 수직으로 뒤집은 첫 번째 텍스처의 픽셀값
+    vec2 flippedUV = vec2(uv.x, 1.0 - uv.y);
+    vec3 flippedColor = texture(iChannel0, flippedUV).rgb;
+
+    // 두 번째 텍스처의 픽셀 밝기
+    vec3 targetColor = texture(iChannel1, uv).rgb;
+    float luma = dot(targetColor, vec3(0.2126, 0.7152, 0.0722));
+
+    // RGB는 반반 섞고, 알파는 1
+    vec3 mixed = 0.5 * flippedColor + 0.5 * vec3(luma);
+    fragColor = vec4(mixed, 1.0);
+}
